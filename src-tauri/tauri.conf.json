@@ -16,6 +16,18 @@
         "all": false,
         "open": true
       },
+      "globalShortcut": {
+        "all": true
+      },
+      "window": {
+        "all": false,
+        "show": true,
+        "hide": true,
+        "close": true,
+        "setFocus": true,
+        "minimize": true,
+        "unminimize": true
+      },
       "clipboard": {
         "all": true,
         "writeText": true,

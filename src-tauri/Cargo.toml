@@ -6,14 +6,17 @@ authors = ["you"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
+# 安装360了的电脑需要关掉再进行build，不然会出现权限问题导致build失败
 [build-dependencies]
 tauri-build = { version = "1", features = [] }
 
 [dependencies]
-tauri = { version = "1", features = [ "clipboard-all", "shell-open"] }
+tauri = { version = "1", features = [ "window-unminimize", "window-minimize", "window-set-focus", "window-close", "window-hide", "window-show", "global-shortcut-all", "clipboard-all", "shell-open"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+tauri-plugin-clipboard = "1" 
+# 手动依赖降级，修改lock文件
+# cargo update -p ravif  --precise 0.11.5
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!
