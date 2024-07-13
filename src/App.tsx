@@ -1,9 +1,6 @@
-import { useEffect, useState } from "react";
-
+import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 import { readText, writeText } from "@tauri-apps/api/clipboard";
-
-import { useWindowShowOrHide } from "./hook/key-hook";
 import { UnlistenFn } from "@tauri-apps/api/event";
 import {
   onTextUpdate,
@@ -12,41 +9,37 @@ import {
   startListening,
   onClipboardUpdate,
 } from "tauri-plugin-clipboard-api";
+import { registerShortcuts, setWindowToBottom } from "./utils";
+import { globalShortcut } from "@tauri-apps/api";
 
 function App() {
   const [lll, setlll] = useState<string[]>([]);
-
-  useWindowShowOrHide();
   const [copiedText, setCopiedText] = useState("Copied text will be here");
+
   let unlistenTextUpdate: UnlistenFn;
   let unlistenImageUpdate: UnlistenFn;
   let unlistenClipboard: () => Promise<void>;
   let unlistenFiles: UnlistenFn;
 
   useEffect(() => {
-    console.log("on mount");
-
     const unlistenFunctions = async () => {
       unlistenTextUpdate = await onTextUpdate((newText) => {
         console.log(newText);
         setCopiedText(newText);
       });
       unlistenImageUpdate = await onImageUpdate((_) => {
-        console.log("Image updated");
+        console.log("Image updated", _);
       });
       unlistenFiles = await onFilesUpdate((_) => {
         console.log("Files updated", _);
       });
       unlistenClipboard = await startListening();
-
-      onClipboardUpdate(() => {
-        console.log(
-          "plugin:clipboard://clipboard-monitor/update event received"
-        );
-      });
     };
 
-    unlistenFunctions().catch(console.error);
+    unlistenFunctions()
+      .then(() => setWindowToBottom())
+      .then(() => registerShortcuts())
+      .catch(console.error);
 
     return () => {
       if (unlistenTextUpdate) {
@@ -61,6 +54,7 @@ function App() {
       if (unlistenFiles) {
         unlistenFiles();
       }
+      globalShortcut.unregister("CommandOrControl + `");
     };
   }, []);
 
@@ -98,4 +92,3 @@ function App() {
 }
 
 export default App;
-readText;

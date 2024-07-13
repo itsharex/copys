@@ -11,7 +11,7 @@ edition = "2021"
 tauri-build = { version = "1", features = [] }
 
 [dependencies]
-tauri = { version = "1", features = [ "window-unminimize", "window-minimize", "window-set-focus", "window-close", "window-hide", "window-show", "global-shortcut-all", "clipboard-all", "shell-open"] }
+tauri = { version = "1", features = [ "window-set-size", "window-set-position", "window-unminimize", "window-minimize", "window-set-focus", "window-close", "window-hide", "window-show", "global-shortcut-all", "clipboard-all", "shell-open"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tauri-plugin-clipboard = "1" 
