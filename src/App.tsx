@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
-import "./App.css";
+import { ContextType, useEffect, useState } from "react";
 import { readText, writeText } from "@tauri-apps/api/clipboard";
 import { UnlistenFn } from "@tauri-apps/api/event";
 import {
@@ -7,31 +6,59 @@ import {
   onImageUpdate,
   onFilesUpdate,
   startListening,
-  onClipboardUpdate,
+  onSomethingUpdate,
 } from "tauri-plugin-clipboard-api";
-import { registerShortcuts, setWindowToBottom } from "./utils";
+import {
+  copying,
+  CopyTextTypeToStr,
+  registerShortcuts,
+  setWindowToBottom,
+} from "./utils";
 import { globalShortcut } from "@tauri-apps/api";
+import { ScrollShadow, Tab, Tabs } from "@nextui-org/react";
+import { CopyTextDataType, CopyTextType } from "./utils/copy-text";
+import { CopyTextStore } from "./store/context";
+import CardList from "./components/card-list";
 
 function App() {
-  const [lll, setlll] = useState<string[]>([]);
-  const [copiedText, setCopiedText] = useState("Copied text will be here");
+  const [selected, setSelected] = useState(CopyTextType.TEXT);
+  const [copyTextArr, setCopyTextArr] = useState<CopyTextDataType[]>([]);
 
+  const delItem = () => {};
+  const addItem = (type: CopyTextType, data: string) => {
+    if (!data) {
+      return;
+    }
+    setCopyTextArr((old) => [
+      ...old,
+      {
+        id: Date.now(),
+        groupType: CopyTextTypeToStr[type],
+        type,
+        data,
+      },
+    ]);
+  };
+  console.log("copyTextArr", copyTextArr);
   let unlistenTextUpdate: UnlistenFn;
   let unlistenImageUpdate: UnlistenFn;
   let unlistenClipboard: () => Promise<void>;
-  let unlistenFiles: UnlistenFn;
+  let unlistenSomethingUpdate: UnlistenFn;
 
   useEffect(() => {
     const unlistenFunctions = async () => {
       unlistenTextUpdate = await onTextUpdate((newText) => {
         console.log(newText);
-        setCopiedText(newText);
+        if (copying.length > 0) return;
+        addItem(CopyTextType.TEXT, newText);
       });
       unlistenImageUpdate = await onImageUpdate((_) => {
         console.log("Image updated", _);
+        if (copying.length > 0) return;
+        addItem(CopyTextType.IMAGE, _);
       });
-      unlistenFiles = await onFilesUpdate((_) => {
-        console.log("Files updated", _);
+      unlistenSomethingUpdate = await onSomethingUpdate((updatedTypes) => {
+        console.log("updated types:", updatedTypes);
       });
       unlistenClipboard = await startListening();
     };
@@ -51,43 +78,69 @@ function App() {
       if (unlistenClipboard) {
         unlistenClipboard();
       }
-      if (unlistenFiles) {
-        unlistenFiles();
+      if (unlistenSomethingUpdate) {
+        unlistenSomethingUpdate();
       }
       globalShortcut.unregister("CommandOrControl + `");
     };
   }, []);
 
   return (
-    <div className="container">
-      <h1>Welcome to Tauri!</h1>
-      {lll.map((item, i) => {
-        return <div key={i}>{item}</div>;
-      })}
-      <hr />
-      <button
-        type="button"
-        onClick={async () => {
-          const clipboardText = await readText();
-          clipboardText && setlll([...lll, clipboardText]);
-        }}
-      >
-        readText
-      </button>
-      <button
-        type="button"
-        onClick={async () => {
-          await writeText("Tauri is awesome!");
-        }}
-      >
-        writeText
-      </button>
+    <CopyTextStore.Provider value={{ copyTextArr, currentTap: selected }}>
+      <div className="container">
+        {/* {lll.map((item, i) => {
+          return <div key={i}>{item}</div>;
+        })}
+        <hr />
+        <button
+          type="button"
+          onClick={async () => {
+            const clipboardText = await readText();
+            clipboardText && setlll([...lll, clipboardText]);
+          }}
+        >
+          readText
+        </button>
+        <button
+          type="button"
+          onClick={async () => {
+            await writeText("Tauri is awesome!");
+          }}
+        >
+          writeText
+        </button> */}
 
-      <div>
-        <h1>Try and copy this sentence</h1>
-        <h1>{copiedText}</h1>
+        {/* <div>
+          <h1>Try and copy this sentence</h1>
+          <h1>{copiedText}</h1>
+        </div> */}
+
+        <div className="flex">
+          <Tabs
+            variant="light"
+            aria-label="Tabs variants"
+            selectedKey={selected}
+            onSelectionChange={(v) => {
+              console.log("v", v);
+              setSelected(v as CopyTextType);
+            }}
+          >
+            {CopyTextTypeToStr.map((str, idx) => (
+              <Tab key={idx} title={str} />
+            ))}
+          </Tabs>
+        </div>
+
+        <ScrollShadow
+          hideScrollBar
+          draggable
+          orientation="horizontal"
+          className="flex gap-6 w-screen my-5 px-10 overflow-auto"
+        >
+          <CardList />
+        </ScrollShadow>
       </div>
-    </div>
+    </CopyTextStore.Provider>
   );
 }
 

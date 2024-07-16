@@ -1,5 +1,4 @@
 import { globalShortcut } from "@tauri-apps/api";
-import { hide, show } from "@tauri-apps/api/app";
 import {
   currentMonitor,
   appWindow,
@@ -7,12 +6,22 @@ import {
   LogicalPosition,
 } from "@tauri-apps/api/window";
 
+export const CopyTextTypeToStr = ["Text", "Photos"];
+
+// 复制队列，用于监听事件区分复制行为
+export const copying: number[] = [];
+
 export const setWindowToBottom = async () => {
   const monitor = await currentMonitor();
   if (monitor) {
     const { size, scaleFactor } = monitor;
-    await appWindow.setSize(new LogicalSize(size.width / scaleFactor, 400));
-    await appWindow.setPosition(new LogicalPosition(0, 400));
+    let MYWINDOWHEIGHT = 350;
+    await appWindow.setSize(
+      new LogicalSize(size.width / scaleFactor, MYWINDOWHEIGHT)
+    );
+    await appWindow.setPosition(
+      new LogicalPosition(0, size.height / scaleFactor - MYWINDOWHEIGHT - 70)
+    );
   }
 };
 
