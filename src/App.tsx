@@ -1,10 +1,8 @@
-import { ContextType, useEffect, useState } from "react";
-import { readText, writeText } from "@tauri-apps/api/clipboard";
+import { useEffect, useState } from "react";
 import { UnlistenFn } from "@tauri-apps/api/event";
 import {
   onTextUpdate,
   onImageUpdate,
-  onFilesUpdate,
   startListening,
   onSomethingUpdate,
 } from "tauri-plugin-clipboard-api";
@@ -24,7 +22,7 @@ function App() {
   const [selected, setSelected] = useState(CopyTextType.TEXT);
   const [copyTextArr, setCopyTextArr] = useState<CopyTextDataType[]>([]);
 
-  const delItem = () => {};
+  // const delItem = () => {};
   const addItem = (type: CopyTextType, data: string) => {
     if (!data) {
       return;
