@@ -13,10 +13,18 @@ import {
   setWindowToBottom,
 } from "./utils";
 import { globalShortcut } from "@tauri-apps/api";
-import { ScrollShadow, Tab, Tabs } from "@nextui-org/react";
+import {
+  Button,
+  Kbd,
+  ScrollShadow,
+  Tab,
+  Tabs,
+  Tooltip,
+} from "@nextui-org/react";
 import { CopyTextDataType, CopyTextType } from "./utils/copy-text";
 import { CopyTextStore } from "./store/context";
 import CardList from "./components/card-list";
+import { relaunch } from "@tauri-apps/api/process";
 
 function App() {
   const [selected, setSelected] = useState(CopyTextType.TEXT);
@@ -27,15 +35,27 @@ function App() {
     if (!data) {
       return;
     }
-    setCopyTextArr((old) => [
-      ...old,
-      {
-        id: Date.now(),
-        groupType: CopyTextTypeToStr[type],
-        type,
-        data,
-      },
-    ]);
+    setCopyTextArr((old) => {
+      let tmp = [
+        {
+          id: Date.now(),
+          groupType: CopyTextTypeToStr[type],
+          type,
+          data,
+        },
+        ...old,
+      ];
+      let strSet = new Set();
+      let newArr: CopyTextDataType[] = [];
+      tmp.forEach((obj) => {
+        if (strSet.has(obj.data)) {
+          return;
+        }
+        strSet.add(obj.data);
+        newArr.push(obj);
+      });
+      return newArr;
+    });
   };
   console.log("copyTextArr", copyTextArr);
   let unlistenTextUpdate: UnlistenFn;
@@ -86,34 +106,10 @@ function App() {
   return (
     <CopyTextStore.Provider value={{ copyTextArr, currentTap: selected }}>
       <div className="container">
-        {/* {lll.map((item, i) => {
-          return <div key={i}>{item}</div>;
-        })}
-        <hr />
-        <button
-          type="button"
-          onClick={async () => {
-            const clipboardText = await readText();
-            clipboardText && setlll([...lll, clipboardText]);
-          }}
-        >
-          readText
-        </button>
-        <button
-          type="button"
-          onClick={async () => {
-            await writeText("Tauri is awesome!");
-          }}
-        >
-          writeText
-        </button> */}
-
-        {/* <div>
-          <h1>Try and copy this sentence</h1>
-          <h1>{copiedText}</h1>
-        </div> */}
-
-        <div className="flex">
+        <div className="w-full flex items-center justify-evenly">
+          <Tooltip className="text-blue-500" content="显示/隐藏">
+            <Kbd keys={["command"]}>+ `</Kbd>
+          </Tooltip>
           <Tabs
             variant="light"
             aria-label="Tabs variants"
@@ -127,6 +123,15 @@ function App() {
               <Tab key={idx} title={str} />
             ))}
           </Tabs>
+          <Button
+            className="mx-4"
+            size="sm"
+            onClick={() => {
+              window.location.reload();
+            }}
+          >
+            Refresh
+          </Button>
         </div>
 
         <ScrollShadow
