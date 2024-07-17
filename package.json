@@ -1,14 +1,17 @@
 {
   "name": "copys",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "start": "tauri dev"
+    "start": "tauri dev",
+    "win": "tauri build",
+    "mac": "tauri build --target aarch64-apple-darwin",
+    "mac-i": "tauri build --target x86_64-apple-darwin"
   },
   "dependencies": {
     "@nextui-org/react": "^2.4.2",
@@ -26,6 +29,7 @@
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.39",
     "tailwindcss": "^3.4.4",
+    "terser": "^5.31.3",
     "typescript": "^5.2.2",
     "vite": "^5.3.1"
   }

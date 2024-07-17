@@ -1,6 +1,6 @@
 [package]
 name = "copys"
-version = "0.0.0"
+version = "0.1.0"
 description = "A Tauri App"
 authors = ["you"]
 edition = "2021"
@@ -11,13 +11,32 @@ edition = "2021"
 tauri-build = { version = "1", features = [] }
 
 [dependencies]
-tauri = { version = "1", features = [ "window-set-size", "window-set-position", "window-unminimize", "window-minimize", "window-set-focus", "window-close", "window-hide", "window-show", "global-shortcut-all", "clipboard-all", "shell-open"] }
+tauri = { version = "1", features = [
+    "window-set-size",
+    "window-set-position",
+    "window-unminimize",
+    "window-minimize",
+    "window-set-focus",
+    "window-close",
+    "window-hide",
+    "window-show",
+    "global-shortcut-all",
+    "clipboard-all",
+    "shell-open",
+] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tauri-plugin-clipboard = "1" 
+tauri-plugin-clipboard = "1"
 # 手动依赖降级，修改lock文件
 # cargo update -p ravif  --precise 0.11.5
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!
 custom-protocol = ["tauri/custom-protocol"]
+
+[profile.release]
+panic = "abort"   # Strip expensive panic clean-up logic
+codegen-units = 1 # Compile crates one after another so the compiler can optimize better
+lto = true        # Enables link to optimizations
+opt-level = "s"   # Optimize for binary size
+strip = true      # Remove debug symbols

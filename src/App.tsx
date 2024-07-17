@@ -24,7 +24,6 @@ import {
 import { CopyTextDataType, CopyTextType } from "./utils/copy-text";
 import { CopyTextStore } from "./store/context";
 import CardList from "./components/card-list";
-import { relaunch } from "@tauri-apps/api/process";
 
 function App() {
   const [selected, setSelected] = useState(CopyTextType.TEXT);
