@@ -9,6 +9,7 @@ import {
 import {
   copying,
   CopyTextTypeToStr,
+  handleBlur,
   registerShortcuts,
   setWindowToBottom,
 } from "./utils";
@@ -84,6 +85,7 @@ function App() {
       .then(() => setWindowToBottom())
       .then(() => registerShortcuts())
       .catch(console.error);
+    window.addEventListener("blur", handleBlur);
 
     return () => {
       if (unlistenTextUpdate) {
@@ -99,6 +101,7 @@ function App() {
         unlistenSomethingUpdate();
       }
       globalShortcut.unregister("CommandOrControl + `");
+      window.removeEventListener("blur", handleBlur);
     };
   }, []);
 

@@ -25,8 +25,9 @@ export const setWindowToBottom = async () => {
   }
 };
 
+let flag = true;
+
 export async function registerShortcuts(shortcuts = "CommandOrControl + `") {
-  let flag = true;
   // 注册显示/隐藏窗口的快捷键
   await globalShortcut.register(shortcuts, async () => {
     if (flag) {
@@ -41,3 +42,12 @@ export async function registerShortcuts(shortcuts = "CommandOrControl + `") {
     flag = true;
   });
 }
+
+export const handleBlur = async () => {
+  if (flag) {
+    await appWindow.hide();
+    await appWindow.minimize();
+    flag = false;
+    return;
+  }
+};
