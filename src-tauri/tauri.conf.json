@@ -45,6 +45,10 @@
         "all": true,
         "show": true,
         "hide": true
+      },
+      "process": {
+        "all": false,
+        "relaunch": true
       }
     },
     "windows": [
