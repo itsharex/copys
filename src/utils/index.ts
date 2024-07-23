@@ -1,4 +1,7 @@
-import { globalShortcut } from "@tauri-apps/api";
+import { app, globalShortcut } from "@tauri-apps/api";
+import { confirm, message } from "@tauri-apps/api/dialog";
+import { relaunch } from "@tauri-apps/api/process";
+import { checkUpdate, installUpdate } from "@tauri-apps/api/updater";
 import {
   currentMonitor,
   appWindow,
@@ -26,6 +29,7 @@ export const setWindowToBottom = async () => {
 };
 
 let flag = true;
+let isChecking = true;
 
 export async function registerShortcuts(shortcuts = "CommandOrControl + `") {
   // 注册显示/隐藏窗口的快捷键
@@ -44,10 +48,40 @@ export async function registerShortcuts(shortcuts = "CommandOrControl + `") {
 }
 
 export const handleBlur = async () => {
+  if (isChecking) return;
   if (flag) {
     await appWindow.hide();
     await appWindow.minimize();
     flag = false;
     return;
+  }
+};
+
+export const checkVersionUpdate = async () => {
+  try {
+    isChecking = true;
+    const { shouldUpdate, manifest } = await checkUpdate();
+    console.warn("manifest", manifest);
+    const [appName, appVersion] = await Promise.all([
+      app.getName(),
+      app.getVersion(),
+    ]);
+    if (shouldUpdate) {
+      const res = await confirm(
+        `${appName} ${manifest?.version} is now available -- you have ${appVersion}.\n\nWould you like to install it now?\n\nRelease Notes:\n${manifest?.body}`,
+        { title: "A new version of tauri is available!" }
+      );
+      if (!res) return;
+      // Install the update. This will also restart the app on Windows!
+      await installUpdate();
+      // On macOS and Linux you will need to restart the app manually.
+      // You could use this step to display another confirmation dialog.
+      await relaunch();
+    }
+  } catch (error) {
+    console.error(error);
+    await message("update error" + JSON.stringify(error), "Result");
+  } finally {
+    isChecking = false;
   }
 };

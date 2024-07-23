@@ -7,6 +7,7 @@ import {
   onSomethingUpdate,
 } from "tauri-plugin-clipboard-api";
 import {
+  checkVersionUpdate,
   copying,
   CopyTextTypeToStr,
   handleBlur,
@@ -84,22 +85,15 @@ function App() {
     unlistenFunctions()
       .then(() => setWindowToBottom())
       .then(() => registerShortcuts())
+      .then(() => checkVersionUpdate())
       .catch(console.error);
     window.addEventListener("blur", handleBlur);
 
     return () => {
-      if (unlistenTextUpdate) {
-        unlistenTextUpdate();
-      }
-      if (unlistenImageUpdate) {
-        unlistenImageUpdate();
-      }
-      if (unlistenClipboard) {
-        unlistenClipboard();
-      }
-      if (unlistenSomethingUpdate) {
-        unlistenSomethingUpdate();
-      }
+      unlistenTextUpdate && unlistenTextUpdate();
+      unlistenImageUpdate && unlistenImageUpdate();
+      unlistenClipboard && unlistenClipboard();
+      unlistenSomethingUpdate && unlistenSomethingUpdate();
       globalShortcut.unregister("CommandOrControl + `");
       window.removeEventListener("blur", handleBlur);
     };
@@ -116,10 +110,7 @@ function App() {
             variant="light"
             aria-label="Tabs variants"
             selectedKey={selected}
-            onSelectionChange={(v) => {
-              console.log("v", v);
-              setSelected(v as CopyTextType);
-            }}
+            onSelectionChange={(v) => setSelected(v as CopyTextType)}
           >
             {CopyTextTypeToStr.map((str, idx) => (
               <Tab key={idx} title={str} />
