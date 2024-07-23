@@ -1,11 +1,4 @@
-import {
-  Card,
-  CardBody,
-  CardFooter,
-  Kbd,
-  Button,
-  Image,
-} from "@nextui-org/react";
+import { Card, CardBody, CardFooter, Button, Image } from "@nextui-org/react";
 import { memo, useMemo, useState } from "react";
 import { CheckIcon, CopyIcon } from "../icon";
 import { CopyTextType } from "../../utils/copy-text";
@@ -66,18 +59,18 @@ function CardItem({ type, data }: any) {
   };
   return (
     <Card
-      className="w-40 flex-none"
+      className="w-44 flex-none"
       shadow="sm"
       isPressable
       onPress={handleItemClick}
     >
       {CardBodyJSX}
-      <CardFooter className="justify-between h-8">
-        <Kbd keys={["command"]}>1</Kbd>
+      <CardFooter className="justify-end h-8 m-1">
+        {/* <Kbd keys={["command"]}>1</Kbd> */}
         <Button isIconOnly variant="light" onClick={handleItemClick}>
           {flag ? (
             <CheckIcon
-              className="w-7 h-7"
+              className="w-6 h-6"
               style={{ animation: ".3s ease-out bouncein" }}
             />
           ) : (

@@ -11,7 +11,7 @@ edition = "2021"
 tauri-build = { version = "1", features = [] }
 
 [dependencies]
-tauri = { version = "1", features = [ "dialog-message", "app-all", "dialog-confirm", "updater",
+tauri = { version = "1", features = [ "process-relaunch", "dialog-message", "app-all", "dialog-confirm", "updater",
     "window-set-size",
     "window-set-position",
     "window-unminimize",

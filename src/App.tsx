@@ -88,7 +88,6 @@ function App() {
       .then(() => checkVersionUpdate())
       .catch(console.error);
     window.addEventListener("blur", handleBlur);
-
     return () => {
       unlistenTextUpdate && unlistenTextUpdate();
       unlistenImageUpdate && unlistenImageUpdate();
@@ -103,9 +102,14 @@ function App() {
     <CopyTextStore.Provider value={{ copyTextArr, currentTap: selected }}>
       <div className="container">
         <div className="w-full flex items-center justify-evenly">
-          <Tooltip className="text-blue-500" content="显示/隐藏">
-            <Kbd keys={["command"]}>+ `</Kbd>
-          </Tooltip>
+          <div className="flex gap-3">
+            <Tooltip className="text-blue-500" content="显示/隐藏">
+              <Kbd keys={["command"]}>+ `</Kbd>
+            </Tooltip>
+            <Tooltip className="text-blue-500" content="移动横向滚动条">
+              <Kbd keys="shift">+ 鼠标滑轮</Kbd>
+            </Tooltip>
+          </div>
           <Tabs
             variant="light"
             aria-label="Tabs variants"
@@ -116,14 +120,8 @@ function App() {
               <Tab key={idx} title={str} />
             ))}
           </Tabs>
-          <Button
-            className="mx-4"
-            size="sm"
-            onClick={() => {
-              window.location.reload();
-            }}
-          >
-            Refresh
+          <Button className="mx-4" size="sm" onClick={() => setCopyTextArr([])}>
+            Clear
           </Button>
         </div>
 
